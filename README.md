@@ -13,8 +13,6 @@ The _activity_main.xml_ have buttons to create and remove selected items, and tw
 
 _custom_item_list.xml_, which is the custom item layout, shows an image and text.
 
-Functions are implemented in the _MainActivity.java_
-
 #### Tasks remaining:
 - [x] Simple ListView layout
 - [x] Custom ListView layout
@@ -105,33 +103,33 @@ class MyItem{
         }
     }
 ```
-The _MyAdapter_ class is our custom adapter, need to extend the ArrayAdapter, which extends BaseAdapter. The BaseAdapter has the method _getView()_ that takes care of the process of putting the information in their respective places in the layout.
+The _CustomAdapter_ class is our custom adapter, which extends BaseAdapter. The BaseAdapter has the method _getView()_ that takes care of the process of putting the information in their respective places in the layout.
 
 ```java
-    private class MyAdapter extends ArrayAdapter<MyItem>{
-        Context context;
-        int layoutResourceId;
-        ArrayList<MyItem> data;
+public class CustomAdapter extends BaseAdapter {
+    private Context context;
+    private int layoutId;
+    private ArrayList<MyItem> data;
 
-        MyAdapter(Context context, int layoutResourceId, ArrayList<MyItem> data){
-            super(context, layoutResourceId, data);
-            this.context = context;
-            this.data = data;
-            this.layoutResourceId = layoutResourceId;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent){
-            if(convertView == null){
-                convertView = getLayoutInflater().inflate(layoutResourceId, parent, false);
-            }
-
-            ((ImageView)convertView.findViewById(R.id.imageView)).setImageResource(data.get(position).icon);
-            ((TextView)convertView.findViewById(R.id.text_title)).setText(data.get(position).title);
-
-            return convertView;
-        }
+    CustomAdapter(Context context, int layoutId, ArrayList<MyItem> data){
+        this.context = context;
+        this.data = data;
+        this.layoutId = layoutId;
     }
-```
+    
+    ...
 
-A constructor was defined with the same parameters as when we created an ArrayAdapter for the simple layout to keep the pattern.
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if(convertView == null){
+            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = layoutInflater.inflate(layoutId, parent, false);
+        }
+
+        ((ImageView)convertView.findViewById(R.id.imageView)).setImageResource(data.get(position).icon);
+        ((TextView)convertView.findViewById(R.id.text_title)).setText(data.get(position).text);
+
+        return convertView;
+    }
+}
+```
