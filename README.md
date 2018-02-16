@@ -15,6 +15,14 @@ _custom_item_list.xml_, which is the custom item layout, shows an image and text
 
 Functions are implemented in the _MainActivity.java_
 
+#### Tasks remaining:
+- [x] Simple ListView layout
+- [x] Custom ListView layout
+- [x] One click item
+- [x] long click item
+- [ ] select (highlight) one item
+- [ ] select (highlight) multiple items
+
 ## Simple List
 
 To setup the listView, the following lines are important.
@@ -80,7 +88,7 @@ listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 Which the value returned must be true if the callback consumed the long click (then the _OnItemClick_ method does not run automatically after the _OnItemLongClick_ executes when the finger is released).
 And like in the _OnItemClickListener_, you can create a class implementing the _AdapterView.OnItemLongClickListener_.
 
-### Select item (stay highlighted)
+### Select item (still working)
 
 
 ## Custom List
