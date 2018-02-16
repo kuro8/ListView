@@ -1,17 +1,12 @@
 package com.example.kuro.listviewexample;
 
-import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
 
@@ -22,10 +17,10 @@ public class MainActivity extends AppCompatActivity {
 
     //custom list
     ArrayList<MyItem>arrayListCustom;
-    MyAdapter adapterCustom;
+    CustomAdapter adapterCustom;
     ListView listView2;
 
-    Button b1;
+    Button buttonRemove;
     int itemToRemove = -1;
     int counter = 0;
     int[] images = {R.color.colorAccent, R.color.colorPrimary, R.mipmap.ic_launcher};
@@ -43,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         //Custom List
         listView2 = (ListView) findViewById(R.id.listCustom);
         arrayListCustom = new ArrayList<MyItem>();
-        adapterCustom = new MyAdapter(this, R.layout.custom_item_list, arrayListCustom);
+        adapterCustom = new CustomAdapter(this, R.layout.custom_item_list, arrayListCustom);
         listView2.setAdapter(adapterCustom);
 
 
@@ -62,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
                 itemToRemove = position;
-                b1.setEnabled(true);
+                buttonRemove.setEnabled(true);
                 return true;
             }
         });
@@ -70,14 +65,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 itemToRemove = position;
-                b1.setEnabled(true);
+                buttonRemove.setEnabled(true);
                 return true;
             }
         });
 
         //add item function
-        Button b = (Button) findViewById(R.id.buttonAddItem);
-        b.setOnClickListener(new View.OnClickListener() {
+        Button buttonAdd = (Button) findViewById(R.id.buttonAddItem);
+        buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 counter++;
@@ -86,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
                 //add directly in the adapter
                 adapter.add("simple item" + counter);
-                adapter.notifyDataSetChanged(); //do not forget this to refresh the view
+                adapter.notifyDataSetChanged(); //refresh the view
 
                 //or add in the array attached in the adapter
                 arrayListCustom.add(item);
@@ -95,8 +90,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //remove item function
-        b1 = (Button) findViewById(R.id.buttonRemoveItem);
-        b1.setOnClickListener(new View.OnClickListener() {
+        buttonRemove = (Button) findViewById(R.id.buttonRemoveItem);
+        buttonRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(itemToRemove != -1){
@@ -109,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
                     adapterCustom.notifyDataSetChanged();
 
                     itemToRemove = -1;
-                    b1.setEnabled(false);
+                    buttonRemove.setEnabled(false);
                 }
             }
         });
@@ -120,43 +115,7 @@ public class MainActivity extends AppCompatActivity {
     class MyItemClicked implements AdapterView.OnItemClickListener{
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Toast.makeText(getApplicationContext(), arrayListCustom.get(position).title, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    class MyItem{
-        int icon;
-        String title;
-
-        MyItem(int icon, String title){
-            this.icon = icon;
-            this.title = title;
-        }
-    }
-
-    //customized adapter for listView
-    private class MyAdapter extends ArrayAdapter<MyItem>{
-        Context context;
-        int layoutResourceId;
-        ArrayList<MyItem> data;
-
-        MyAdapter(Context context, int layoutResourceId, ArrayList<MyItem> data){
-            super(context, layoutResourceId, data);
-            this.context = context;
-            this.data = data;
-            this.layoutResourceId = layoutResourceId;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent){
-            if(convertView == null){
-                convertView = getLayoutInflater().inflate(layoutResourceId, parent, false);
-            }
-
-            ((ImageView)convertView.findViewById(R.id.imageView)).setImageResource(data.get(position).icon);
-            ((TextView)convertView.findViewById(R.id.text_title)).setText(data.get(position).title);
-
-            return convertView;
+            Toast.makeText(getApplicationContext(), arrayListCustom.get(position).text, Toast.LENGTH_SHORT).show();
         }
     }
 }
