@@ -1,4 +1,4 @@
-# ListView with ArrayAdapter
+# ListView
 
 This project explain how to add and remove items from ListView, using the default and the custom layout.
 
@@ -10,16 +10,10 @@ The _activity_main.xml_ have buttons to create and remove selected items, and tw
 #### List items Function: ####
 * Simple click: display message with the item information;
 * Long click: select item from list and enable the remove button.
+  * in the simple list only one item can be selected
+  * in the custom list multiple items can be selected
 
 _custom_item_list.xml_, which is the custom item layout, shows an image and text.
-
-#### Tasks remaining:
-- [x] Simple ListView layout
-- [x] Custom ListView layout
-- [x] One click item
-- [x] long click item
-- [ ] select (highlight) one item
-- [ ] select (highlight) multiple items
 
 ## Simple List
 
@@ -29,18 +23,18 @@ ListView listView = (ListView) findViewById(R.id.listDefault);
 ArrayAdapter adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, arrayList);
 listView.setAdapter(adapter);
 ```
-The ArrayAdapter constructor is created with Context, layout id and a ArrayList<T> parameters, in which the elements of the list are placed.
+The ArrayAdapter constructor is created with Context, layout id and a ArrayList<T> parameters, in which the last the lists elements are placed.
 
-By default, `android.R.layout.simple_list_item_1` is a simple layout in which is a single text.
+By default, `android.R.layout.simple_list_item_1` is a simple layout in which display a single text.
 
-Instead of an `arrayList` variable created and appended to the constructor,`new ArrayList<String>()`can be appended directly. In this case, only the adapter can manage the items
+Instead of an `arrayList` variable created and appended to the constructor,`new ArrayList<String>()`can be appended directly. In this case, only the adapter can manage the items.
 
 Then finally the listView need to bind the adapter.
 ```java
 listView.setAdapter(adapter);
 ```
 
-When the ListView has its elements modified, the view needs to be updated by calling this method:
+When the ListView has its elements modified (not applied when a item is selected), the view needs to be refreshed by calling this method:
 ```java
 adapter.notifyDataSetChanged();
 ```
@@ -53,11 +47,11 @@ This method is called when the ListView is clicked
 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Log.d(arrayList.get(position));
+        //do something
     }
 });
 ```
-which the variable `position` is the position of the view in the list.
+which the `position` variable is the position of the list in the view.
 Or you can create a new class implementing the _AdapterView.OnItemClickListener_:
 
 ```java
@@ -86,14 +80,27 @@ listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 Which the value returned must be true if the callback consumed the long click (then the _OnItemClick_ method does not run automatically after the _OnItemLongClick_ executes when the finger is released).
 And like in the _OnItemClickListener_, you can create a class implementing the _AdapterView.OnItemLongClickListener_.
 
-### Select item (still working)
+### Select one item
+To be able to select an item in the ListView needs to be set the selection mode and its color ().
+```java
+listView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
+listView.setSelector(android.R.color.holo_red_light); //setup the color when selected
+```
+Then when an item is clicked to able the select function add this line:
+```java
+simpleListView.setSelected(true);
+```
 
+For some reason, disable the select function is not working to return to the click simple. When an item is clicked, it continues highlighted with the same color setted in the selector. The same happens if the choice mode is changed to CHOICE_MODE_NONE.
+For now, change the color to the previous one and calling `listView.clearFocus()` always when the highlight need to be disable works, but it is not beautiful. Need to find a better way.
+
+### Select multiple items (still working)
 
 ## Custom List
 
 For this example a custom layout item has an image and a text. The _MyItem_ class will be responsible for storing these informations to put in the view.
 ```java
-class MyItem{
+public class MyItem{
         int icon;
         String title;
 
