@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import java.util.ArrayList;
 
@@ -45,6 +46,14 @@ public class CustomAdapter extends BaseAdapter {
 
         ((ImageView)convertView.findViewById(R.id.imageView)).setImageResource(data.get(position).icon);
         ((TextView)convertView.findViewById(R.id.text_title)).setText(data.get(position).text);
+
+        //highlight selected item
+        ListView list = (ListView)parent;
+        if(list.isItemChecked(position)){
+        }
+        else{
+
+        }
 
         return convertView;
     }

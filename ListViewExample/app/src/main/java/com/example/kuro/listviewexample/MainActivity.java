@@ -2,7 +2,12 @@ package com.example.kuro.listviewexample;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -13,17 +18,17 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     //simple list
     ArrayAdapter<String> adapter;
-    ListView listView;
+    ListView simpleListView;
 
     //custom list
     ArrayList<MyItem>arrayListCustom;
     CustomAdapter adapterCustom;
-    ListView listView2;
+    ListView customListView;
 
     Button buttonRemove;
-    int itemToRemove = -1;
+    int positionRemove = -1;
     int counter = 0;
-    int[] images = {R.color.colorAccent, R.color.colorPrimary, R.mipmap.ic_launcher};
+    int[] images = {android.R.drawable.ic_lock_silent_mode, android.R.drawable.ic_dialog_email, android.R.drawable.ic_dialog_alert, android.R.drawable.ic_delete};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,40 +36,59 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //Simple List
-        listView = (ListView) findViewById(R.id.listDefault);
+        simpleListView = (ListView) findViewById(R.id.listDefault);
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, new ArrayList<String>());
-        listView.setAdapter(adapter);
+        simpleListView.setAdapter(adapter);
+        simpleListView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
 
         //Custom List
-        listView2 = (ListView) findViewById(R.id.listCustom);
+        customListView = (ListView) findViewById(R.id.listCustom);
         arrayListCustom = new ArrayList<MyItem>();
         adapterCustom = new CustomAdapter(this, R.layout.custom_item_list, arrayListCustom);
-        listView2.setAdapter(adapterCustom);
+        customListView.setAdapter(adapterCustom);
 
 
         //simple click item function
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        simpleListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getApplicationContext(), adapter.getItem(position), Toast.LENGTH_SHORT).show();
+                if(positionRemove != -1){
+                    if(positionRemove == position){
+                        positionRemove = -1;
+                        simpleListView.setSelected(false);
+                        simpleListView.clearFocus();
+                        simpleListView.setSelector(android.R.color.holo_blue_light);
+                        buttonRemove.setEnabled(false);
+                    }
+                    else{
+                        positionRemove = position;
+                    }
+                }
+                else{
+                    simpleListView.clearFocus();
+                    Toast.makeText(getApplicationContext(), adapter.getItem(position), Toast.LENGTH_SHORT).show();
+                }
             }
         });
-        listView2.setOnItemClickListener(new MyItemClicked());
+        customListView.setOnItemClickListener(new MyItemClicked());
 
         //long click item function
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        simpleListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
-                itemToRemove = position;
+                if(positionRemove != -1)
+                    return true;
+                simpleListView.setSelector(android.R.color.holo_red_light);
+                simpleListView.setSelected(true);
+                positionRemove = position;
                 buttonRemove.setEnabled(true);
                 return true;
             }
         });
-        listView2.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        customListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                itemToRemove = position;
+                customListView.setItemChecked(position, true);
                 buttonRemove.setEnabled(true);
                 return true;
             }
@@ -77,14 +101,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 counter++;
                 int position = counter%images.length;
-                MyItem item = new MyItem(images[position], "custom item " + counter);
+                MyItem newItem = new MyItem(images[position], "custom item " + counter);
 
                 //add directly in the adapter
-                adapter.add("simple item" + counter);
+                adapter.add("simple item " + counter);
                 adapter.notifyDataSetChanged(); //refresh the view
 
-                //or add in the array attached in the adapter
-                arrayListCustom.add(item);
+                //or add in the array attached in the arrayList
+                arrayListCustom.add(newItem);
                 adapterCustom.notifyDataSetChanged();
             }
         });
@@ -94,18 +118,22 @@ public class MainActivity extends AppCompatActivity {
         buttonRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(itemToRemove != -1){
-                    //simple list
-                    adapter.remove(adapter.getItem(itemToRemove));
+                //simple list
+                if(simpleListView.getCheckedItemCount() > 0){
+                    simpleListView.clearFocus();
+                    adapter.remove(adapter.getItem(positionRemove));
+                    positionRemove = -1;
                     adapter.notifyDataSetChanged();
-
-                    //custom list
-                    arrayListCustom.remove(itemToRemove);
-                    adapterCustom.notifyDataSetChanged();
-
-                    itemToRemove = -1;
-                    buttonRemove.setEnabled(false);
                 }
+                //custom list
+                if(customListView.getCheckedItemCount() > 0){
+                    SparseBooleanArray selected = customListView.getCheckedItemPositions();
+                    for(int i=0; i<selected.size(); i++){
+                        arrayListCustom.remove(selected.keyAt(i));
+                    }
+                    adapterCustom.notifyDataSetChanged();
+                }
+                buttonRemove.setEnabled(false);
             }
         });
 
